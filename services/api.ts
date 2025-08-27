@@ -13,6 +13,29 @@ class ApiService {
     this.token = token;
   }
 
+  // Generic HTTP methods
+  async get<T = any>(endpoint: string): Promise<ApiResponse<T>> {
+    return this.request(endpoint, { method: 'GET' });
+  }
+
+  async post<T = any>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    return this.request(endpoint, {
+      method: 'POST',
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
+
+  async put<T = any>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    return this.request(endpoint, {
+      method: 'PUT',
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
+
+  async delete<T = any>(endpoint: string): Promise<ApiResponse<T>> {
+    return this.request(endpoint, { method: 'DELETE' });
+  }
+
   private async request<T = any>(
     endpoint: string,
     options: RequestInit = {}

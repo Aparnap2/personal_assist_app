@@ -12,7 +12,7 @@ export interface UserProfile {
   userId: string;
   goals: string[];
   themes: string[];
-  voiceProfile: VoiceProfile;
+  voiceProfile?: VoiceProfile;
   integrations: Integration[];
   preferences: UserPreferences;
 }
@@ -50,7 +50,38 @@ export interface Draft {
   variants?: string[];
   scheduledFor?: Date;
   bestTimeScore?: number;
+  best_time_score?: number; // Alternative naming
   moderationStatus: 'pending' | 'approved' | 'flagged';
+  themes?: string[];
+  posting_recommendations?: {
+    best_time: string;
+    confidence_score: number;
+    reasoning: string;
+  };
+  readabilityScore?: number;
+  sentimentScore?: {
+    positive: number;
+    negative: number;
+    compound: number;
+  };
+  hookStrength?: {
+    score: number;
+    indicators: {
+      question: boolean;
+      curiosity_gap: boolean;
+      urgency: boolean;
+      controversy: boolean;
+      personal_story: boolean;
+    };
+  };
+  personalizationScore?: number;
+  optimizationSuggestions?: string[];
+  engagementPrediction?: {
+    likes: number;
+    shares: number;
+    comments: number;
+    reach_estimate: number;
+  };
   createdAt: Date;
   updatedAt: Date;
 }

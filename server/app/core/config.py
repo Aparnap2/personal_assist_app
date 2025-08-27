@@ -20,16 +20,35 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: Optional[str] = None
     ANTHROPIC_API_KEY: Optional[str] = None
     
-    # Social Media APIs
+    # OAuth Configuration
+    # Base URLs for redirects (environment-specific)
+    FRONTEND_URL: str = "http://localhost:3000"
+    API_BASE_URL: str = "http://localhost:8000"
+    
+    # Google OAuth
+    GOOGLE_CLIENT_ID: Optional[str] = None
+    GOOGLE_CLIENT_SECRET: Optional[str] = None
+    GOOGLE_REDIRECT_URI: Optional[str] = None
+    
+    # Twitter OAuth
+    TWITTER_CLIENT_ID: Optional[str] = None
+    TWITTER_CLIENT_SECRET: Optional[str] = None
     TWITTER_BEARER_TOKEN: Optional[str] = None
     TWITTER_API_KEY: Optional[str] = None
     TWITTER_API_SECRET: Optional[str] = None
     TWITTER_ACCESS_TOKEN: Optional[str] = None
     TWITTER_ACCESS_TOKEN_SECRET: Optional[str] = None
+    TWITTER_REDIRECT_URI: Optional[str] = None
     
-    # Notion API
+    # LinkedIn OAuth
+    LINKEDIN_CLIENT_ID: Optional[str] = None
+    LINKEDIN_CLIENT_SECRET: Optional[str] = None
+    LINKEDIN_REDIRECT_URI: Optional[str] = None
+    
+    # Notion OAuth
     NOTION_CLIENT_ID: Optional[str] = None
     NOTION_CLIENT_SECRET: Optional[str] = None
+    NOTION_REDIRECT_URI: Optional[str] = None
     
     # Redis (for Celery)
     REDIS_URL: str = "redis://localhost:6379/0"

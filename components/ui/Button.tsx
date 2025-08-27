@@ -1,21 +1,17 @@
-import { styled } from 'nativewind';
 import React from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
-
-const StyledTouchableOpacity = styled(TouchableOpacity);
-const StyledText = styled(Text);
-const StyledView = styled(View);
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'success';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'success' | 'ghost';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   loading?: boolean;
   disabled?: boolean;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
   className?: string;
+  fullWidth?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -28,26 +24,31 @@ const Button: React.FC<ButtonProps> = ({
   icon,
   iconPosition = 'left',
   className = '',
+  fullWidth = false,
 }) => {
   const getVariantStyles = () => {
     switch (variant) {
       case 'primary':
-        return 'bg-primary-500 active:bg-primary-600';
+        return 'bg-primary-500 active:bg-primary-600 border border-primary-500 shadow-sm';
       case 'secondary':
-        return 'bg-gray-500 active:bg-gray-600';
+        return 'bg-primary-50 active:bg-primary-100 border border-primary-200';
       case 'outline':
-        return 'bg-transparent border border-primary-500 active:bg-primary-50';
+        return 'bg-transparent border border-gray-300 active:bg-gray-50';
       case 'danger':
-        return 'bg-red-500 active:bg-red-600';
+        return 'bg-red-500 active:bg-red-600 border border-red-500 shadow-sm';
       case 'success':
-        return 'bg-green-500 active:bg-green-600';
+        return 'bg-green-500 active:bg-green-600 border border-green-500 shadow-sm';
+      case 'ghost':
+        return 'bg-transparent border-0 active:bg-gray-100';
       default:
-        return 'bg-primary-500 active:bg-primary-600';
+        return 'bg-primary-500 active:bg-primary-600 border border-primary-500 shadow-sm';
     }
   };
 
   const getSizeStyles = () => {
     switch (size) {
+      case 'xs':
+        return 'px-2 py-1';
       case 'sm':
         return 'px-3 py-2';
       case 'md':
@@ -62,6 +63,10 @@ const Button: React.FC<ButtonProps> = ({
   const getTextVariantStyles = () => {
     switch (variant) {
       case 'outline':
+        return 'text-gray-700';
+      case 'secondary':
+        return 'text-primary-700';
+      case 'ghost':
         return 'text-primary-500';
       default:
         return 'text-white';
@@ -70,6 +75,8 @@ const Button: React.FC<ButtonProps> = ({
 
   const getTextSizeStyles = () => {
     switch (size) {
+      case 'xs':
+        return 'text-xs';
       case 'sm':
         return 'text-sm';
       case 'md':
@@ -81,10 +88,22 @@ const Button: React.FC<ButtonProps> = ({
     }
   };
 
+  const getLoadingColor = () => {
+    switch (variant) {
+      case 'outline':
+      case 'ghost':
+        return '#6b7280';
+      case 'secondary':
+        return '#6366f1';
+      default:
+        return 'white';
+    }
+  };
+
   const isDisabled = disabled || loading;
 
   return (
-    <StyledTouchableOpacity
+    <TouchableOpacity
       onPress={onPress}
       disabled={isDisabled}
       className={`
@@ -94,32 +113,49 @@ const Button: React.FC<ButtonProps> = ({
         flex-row
         items-center
         justify-center
+        ${fullWidth ? 'w-full' : ''}
         ${isDisabled ? 'opacity-50' : ''}
         ${className}
       `}
     >
       {loading ? (
-        <ActivityIndicator color="white" size="small" />
+        <View className="flex-row items-center">
+          <ActivityIndicator color={getLoadingColor()} size="small" />
+          {title && (
+            <Text
+              className={`
+                ${getTextVariantStyles()}
+                ${getTextSizeStyles()}
+                font-semibold
+                ml-2
+              `}
+            >
+              {title}
+            </Text>
+          )}
+        </View>
       ) : (
-        <StyledView className="flex-row items-center justify-center">
+        <View className="flex-row items-center justify-center">
           {icon && iconPosition === 'left' && (
-            <StyledView className="mr-2">{icon}</StyledView>
+            <View className={title ? "mr-2" : ""}>{icon}</View>
           )}
-          <StyledText
-            className={`
-              ${getTextVariantStyles()}
-              ${getTextSizeStyles()}
-              font-semibold
-            `}
-          >
-            {title}
-          </StyledText>
+          {title && (
+            <Text
+              className={`
+                ${getTextVariantStyles()}
+                ${getTextSizeStyles()}
+                font-semibold
+              `}
+            >
+              {title}
+            </Text>
+          )}
           {icon && iconPosition === 'right' && (
-            <StyledView className="ml-2">{icon}</StyledView>
+            <View className={title ? "ml-2" : ""}>{icon}</View>
           )}
-        </StyledView>
+        </View>
       )}
-    </StyledTouchableOpacity>
+    </TouchableOpacity>
   );
 };
 

@@ -1,10 +1,5 @@
-import { styled } from 'nativewind';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-
-const StyledView = styled(View);
-const StyledText = styled(Text);
-const StyledTouchableOpacity = styled(TouchableOpacity);
 
 interface CardProps {
   children: React.ReactNode;
@@ -50,31 +45,31 @@ const Card: React.FC<CardProps> & {
 
   if (onPress) {
     return (
-      <StyledTouchableOpacity onPress={onPress} className={`${baseStyles} active:opacity-95`}>
+      <TouchableOpacity onPress={onPress} className={`${baseStyles} active:opacity-95`}>
         {children}
-      </StyledTouchableOpacity>
+      </TouchableOpacity>
     );
   }
 
-  return <StyledView className={baseStyles}>{children}</StyledView>;
+  return <View className={baseStyles}>{children}</View>;
 };
 
 const CardHeader: React.FC<CardHeaderProps> = ({ title, subtitle, action, className = '' }) => (
-  <StyledView className={`flex-row items-start justify-between mb-3 ${className}`}>
-    <StyledView className="flex-1">
-      <StyledText className="text-lg font-semibold text-gray-900">{title}</StyledText>
-      {subtitle && <StyledText className="text-sm text-gray-600 mt-1">{subtitle}</StyledText>}
-    </StyledView>
-    {action && <StyledView className="ml-3">{action}</StyledView>}
-  </StyledView>
+  <View className={`flex-row items-start justify-between mb-3 ${className}`}>
+    <View className="flex-1">
+      <Text className="text-lg font-semibold text-gray-900">{title}</Text>
+      {subtitle && <Text className="text-sm text-gray-600 mt-1">{subtitle}</Text>}
+    </View>
+    {action && <View className="ml-3">{action}</View>}
+  </View>
 );
 
 const CardContent: React.FC<CardContentProps> = ({ children, className = '' }) => (
-  <StyledView className={`mb-3 ${className}`}>{children}</StyledView>
+  <View className={`mb-3 ${className}`}>{children}</View>
 );
 
 const CardFooter: React.FC<CardFooterProps> = ({ children, className = '' }) => (
-  <StyledView className={`flex-row items-center justify-between ${className}`}>{children}</StyledView>
+  <View className={`flex-row items-center justify-between ${className}`}>{children}</View>
 );
 
 Card.Header = CardHeader;

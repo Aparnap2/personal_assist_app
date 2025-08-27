@@ -125,9 +125,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithGoogle = async () => {
-    // This would need platform-specific implementation
-    // For now, we'll implement basic email/password auth
-    throw new Error('Google Sign-In not implemented yet');
+    try {
+      const { oauthManager } = await import('../services/oauthService');
+      const result = await oauthManager.authenticateWithProvider('google');
+      
+      if (result) {
+        // Create or sign in user with Google credentials
+        // This would typically create a custom token via your backend
+        // and sign in with Firebase using that token
+        console.log('Google authentication successful:', result.user);
+        
+        // For now, we'll throw an error to indicate this needs backend integration
+        throw new Error('Google Sign-In requires backend integration to complete');
+      } else {
+        throw new Error('Google authentication was cancelled');
+      }
+    } catch (error) {
+      console.error('Google Sign-In error:', error);
+      throw error;
+    }
   };
 
   const handleSignOut = async () => {

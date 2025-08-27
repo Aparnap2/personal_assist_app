@@ -1,10 +1,5 @@
-import { styled } from 'nativewind';
 import React from 'react';
 import { Text, TextInput, TextInputProps, View } from 'react-native';
-
-const StyledView = styled(View);
-const StyledText = styled(Text);
-const StyledTextInput = styled(TextInput);
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -29,19 +24,19 @@ const Input: React.FC<InputProps> = ({
   const hasError = !!error;
 
   return (
-    <StyledView className={`${containerClassName}`}>
+    <View className={`${containerClassName}`}>
       {label && (
-        <StyledText className="text-sm font-medium text-gray-700 mb-2">{label}</StyledText>
+        <Text className="text-sm font-medium text-gray-700 mb-2">{label}</Text>
       )}
       
-      <StyledView className="relative">
+      <View className="relative">
         {leftIcon && (
-          <StyledView className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
+          <View className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
             {leftIcon}
-          </StyledView>
+          </View>
         )}
         
-        <StyledTextInput
+        <TextInput
           className={`
             w-full
             px-4
@@ -59,18 +54,18 @@ const Input: React.FC<InputProps> = ({
         />
         
         {rightIcon && (
-          <StyledView className="absolute right-3 top-1/2 -translate-y-1/2 z-10">
+          <View className="absolute right-3 top-1/2 -translate-y-1/2 z-10">
             {rightIcon}
-          </StyledView>
+          </View>
         )}
-      </StyledView>
+      </View>
       
       {(error || helper) && (
-        <StyledText className={`text-sm mt-1 ${hasError ? 'text-red-600' : 'text-gray-600'}`}>
+        <Text className={`text-sm mt-1 ${hasError ? 'text-red-600' : 'text-gray-600'}`}>
           {error || helper}
-        </StyledText>
+        </Text>
       )}
-    </StyledView>
+    </View>
   );
 };
 

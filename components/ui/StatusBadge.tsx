@@ -1,9 +1,5 @@
-import { styled } from 'nativewind';
 import React from 'react';
 import { Text, View } from 'react-native';
-
-const StyledView = styled(View);
-const StyledText = styled(Text);
 
 interface StatusBadgeProps {
   status: 'pending' | 'approved' | 'rejected' | 'scheduled' | 'published' | 'flagged';
@@ -96,7 +92,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md', classNam
   };
 
   return (
-    <StyledView
+    <View
       className={`
         ${getStatusStyles()}
         ${getSizeStyles()}
@@ -105,7 +101,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md', classNam
         ${className}
       `}
     >
-      <StyledText
+      <Text
         className={`
           ${getTextColor()}
           ${getTextSize()}
@@ -114,8 +110,8 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md', classNam
         `}
       >
         {getStatusText()}
-      </StyledText>
-    </StyledView>
+      </Text>
+    </View>
   );
 };
 

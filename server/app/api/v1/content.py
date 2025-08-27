@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from datetime import datetime
+from pydantic import BaseModel
 
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
@@ -14,6 +16,14 @@ from app.schemas.content import (
     FeedbackCreate
 )
 from app.services.ai_service import ai_service
+from app.services.scheduler_service import content_scheduler, content_publisher, engagement_tracker
+
+class ScheduleContentRequest(BaseModel):
+    scheduled_time: Optional[datetime] = None
+    auto_optimize: bool = True
+
+class RescheduleContentRequest(BaseModel):
+    new_time: datetime
 
 router = APIRouter()
 
@@ -218,4 +228,201 @@ async def get_draft(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch draft"
+        )
+
+# Enhanced Scheduling Endpoints
+@router.post("/drafts/{draft_id}/schedule")
+async def schedule_content(
+    draft_id: int,
+    request: ScheduleContentRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Schedule content for publishing with intelligent timing"""
+    try:
+        result = await content_scheduler.schedule_content(
+            draft_id=draft_id,
+            user_id=current_user.id,
+            scheduled_time=request.scheduled_time,
+            auto_optimize=request.auto_optimize
+        )
+        
+        if "error" in result:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=result["error"]
+            )
+        
+        return {
+            "success": True,
+            "data": result
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error scheduling content: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to schedule content"
+        )
+
+@router.delete("/drafts/{draft_id}/schedule")
+async def cancel_scheduled_content(
+    draft_id: int,
+    current_user: User = Depends(get_current_user)
+):
+    """Cancel scheduled content"""
+    try:
+        result = await content_scheduler.cancel_scheduled_content(draft_id, current_user.id)
+        
+        if "error" in result:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=result["error"]
+            )
+        
+        return result
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error canceling scheduled content: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to cancel scheduled content"
+        )
+
+@router.put("/drafts/{draft_id}/reschedule")
+async def reschedule_content(
+    draft_id: int,
+    request: RescheduleContentRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Reschedule existing scheduled content"""
+    try:
+        result = await content_scheduler.reschedule_content(
+            draft_id, current_user.id, request.new_time
+        )
+        
+        if "error" in result:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=result["error"]
+            )
+        
+        return {
+            "success": True,
+            "data": result
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error rescheduling content: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to reschedule content"
+        )
+
+@router.get("/scheduled")
+async def get_scheduled_content(
+    days_ahead: int = Query(default=7, ge=1, le=30),
+    current_user: User = Depends(get_current_user)
+):
+    """Get all scheduled content for user"""
+    try:
+        scheduled_content = await content_scheduler.get_scheduled_content(
+            current_user.id, days_ahead
+        )
+        
+        return {
+            "success": True,
+            "data": scheduled_content
+        }
+        
+    except Exception as e:
+        print(f"Error fetching scheduled content: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch scheduled content"
+        )
+
+@router.post("/drafts/{draft_id}/publish")
+async def publish_content_immediately(
+    draft_id: int,
+    current_user: User = Depends(get_current_user)
+):
+    """Publish content immediately"""
+    try:
+        result = await content_publisher.publish_content(draft_id)
+        
+        if "error" in result:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=result["error"]
+            )
+        
+        return {
+            "success": True,
+            "data": result
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error publishing content: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to publish content"
+        )
+
+# Performance and Analytics Endpoints
+@router.get("/posts/{post_id}/performance")
+async def get_post_performance(
+    post_id: int,
+    current_user: User = Depends(get_current_user)
+):
+    """Get performance metrics for a published post"""
+    try:
+        result = await content_publisher.get_post_performance(post_id, current_user.id)
+        
+        if "error" in result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=result["error"]
+            )
+        
+        return {
+            "success": True,
+            "data": result
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error fetching post performance: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch post performance"
+        )
+
+@router.get("/insights")
+async def get_performance_insights(
+    days: int = Query(default=30, ge=7, le=90),
+    current_user: User = Depends(get_current_user)
+):
+    """Get performance insights and recommendations"""
+    try:
+        insights = await engagement_tracker.get_performance_insights(current_user.id, days)
+        
+        return {
+            "success": True,
+            "data": insights
+        }
+        
+    except Exception as e:
+        print(f"Error fetching performance insights: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch performance insights"
         )
